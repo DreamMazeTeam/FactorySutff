@@ -8,11 +8,15 @@
 // Для отладочной информации
 //#define DEBUG 
 #ifdef DEBUG
-    #define print(x) Serial.print(x)
-    #define println(x) Serial.println(x)
+
+#define print(x) Serial.print(x)
+#define println(x) Serial.println(x)
+
 #else
-    #define print(x)
-    #define println(x)
+
+#define print(x)
+#define println(x)
+
 #endif
 
 #include "liquid_crystal_i2c.h"
