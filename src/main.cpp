@@ -5,7 +5,7 @@
 #define SLAVE   0
 #define MASTER  1
 
-#define MODE MASTER
+#define MODE SLAVE
 
 #if MODE == MASTER
     #define src master
@@ -142,12 +142,16 @@ void master::loop()
         
     }
     
+   
+   
     radio.setPacketValue((uint32_t)
                         (value[3] * 1000 +
                         value[2] *  100 +
                         value[1] *   10 +
                         value[0]));
     radio.sendPacket();
+   
+    
 
     btnPrevState = btnCurrentState;
 }
@@ -158,6 +162,7 @@ void slave::setup()
     lcd.begin();
     lcd.backlight();
     lcd.blink_off();
+    Serial.begin(9600);
 
     radio.begin(0xF0F0F0F0D2LL,0xF0F0F0F0E1LL);
     radio.setPacketFormat(2, 1);
@@ -173,9 +178,13 @@ void slave::loop()
 
 void slave::updateScreen()
 {
+    
+    Serial.println(buffer); 
+    
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(buffer);
+    
 }
 
 ISR(PCINT0_vect) {
