@@ -152,10 +152,10 @@ void master::loop()
         }
         
         radio.setPacketValue((uint32_t)
-                              value[3] * 1000 + 
-                              value[2] *  100 +
-                              value[1] *   10 +
-                              value[0]);
+                              value[0] * 1000 + 
+                              value[1] *  100 +
+                              value[2] *   10 +
+                              value[3]);
         radio.sendPacket();
         
         btnPrevState = btnCurrentState;
