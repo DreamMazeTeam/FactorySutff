@@ -3,6 +3,7 @@
 #include <SPI.h>
 
 #include "liquid_crystal_i2c.h"
+#include "SerialFlow.h"
 #include "nrf24l01.h"
 #include "encoder.h"
 #include "rf24.h"
@@ -16,7 +17,7 @@
 #define SLAVE  0
 #define MASTER 1
 
-#define MODE SLAVE
+#define MODE MASTER
 
 RF24 radio(pinCeRf24, pinCsRf24);
 Encoder encoder(pinEncClk, pinEncDt, pinEncSw);
@@ -24,16 +25,41 @@ LiquidCrystal lcd(0x27, 16, 2);
 
 uint8_t attachPCINT(uint8_t pin);
 
+SerialFlow rd(5, 6);
+const unsigned long data_to = 100; 
+unsigned long tm, data_next;
+
 void setup() {
     Serial.begin(9600);
     lcd.begin();
 
     attachPCINT(pinEncClk);
     attachPCINT(pinEncDt);
+
+    rd.setPacketFormat(2, 1);
+
+#if MODE == SLAVE
+    rd.begin(0xF0F0F0F0D2LL,0xF0F0F0F0E1LL);
+#elif MODE == MASTER
+    rd.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
+#endif
 }
 
 void loop() {
-    
+#if MODE == SLAVE
+    unsigned int v;
+    if( rd.receivePacket() ){
+        v = rd.getPacketValue(0);
+        Serial.println(v);
+    }
+#elif MODE == MASTER
+    tm = millis();
+    if( tm > data_next ){
+        data_next = tm + data_to;
+        rd.setPacketValue( tm );
+        rd.sendPacket();
+    }
+#endif
 }
 
 uint8_t attachPCINT(uint8_t pin) {

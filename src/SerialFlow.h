@@ -8,12 +8,12 @@
 #ifndef SerialFlow_h
 #define SerialFlow_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 // uncomment desired library
 //#include <FastSerial.h>
-//#include <RF24.h>
-#include <HardwareSerial.h>
+#include "RF24.h"
+//#include <HardwareSerial.h>
 
 #define MAX_PACKET_SIZE 8
 
