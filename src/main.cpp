@@ -174,7 +174,12 @@ void slave::setup()
 void slave::loop()
 {
     if (radio.receivePacket()) {
-        buffer = radio.getPacketValue(0);
+        uint32_t data = radio.getPacketValue(0);
+
+        if (data <= 9999 || data >= 0){
+            buffer = data;
+        }
+
         updateScreen();
     }
 }
