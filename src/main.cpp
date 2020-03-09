@@ -1,6 +1,4 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include <SPI.h>
 
 #define SLAVE   0
 #define MASTER  1
@@ -27,6 +25,8 @@
 
 #define VALUE_LEN 4
 
+#if MODE == SLAVE
+
 namespace slave
 {
     SerialFlow radio(CE, CS);
@@ -39,6 +39,8 @@ namespace slave
 
     void updateScreen();
 }
+
+#elif MODE == MASTER
 
 namespace master
 {
@@ -62,6 +64,8 @@ namespace master
     void updateScreen();
 };
 
+#endif
+
 void setup() {
     src::setup();
 }
@@ -69,6 +73,8 @@ void setup() {
 void loop() {
     src::loop();
 }
+
+#if MODE == MASTER
 
 uint8_t master::attachPCINT(uint8_t pin)
 {
@@ -104,6 +110,8 @@ void master::updateScreen()
 
 void master::setup() 
 {
+    Serial.begin(9600);
+
     pinMode(SW, INPUT);
     pinMode(BUTTON, INPUT);
 
@@ -117,41 +125,43 @@ void master::setup()
     encoder.setType(TYPE2);
     encoder.setDirection(REVERSE);
 
-    radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
     radio.setPacketFormat(2, 1);
+    radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
+
+    updateScreen();
 }
 
 void master::loop()
 {
-    btnCurrentState = digitalRead(BUTTON);
+        btnCurrentState = digitalRead(BUTTON);
 
-    if (encoder.isLeft()) {
-        if (value[pos] > 0) value[pos]--;
-        else value[pos] = 9;
-        updateScreen();
-    }
-    else if (encoder.isRight()) {
-        if (value[pos] < 9) value[pos]++;
-        else value[pos] = 0;
-        updateScreen();
-    }
-    else if ((btnCurrentState == LOW) && (btnPrevState == HIGH)) {
-        if (pos < 3) pos++;
-        else pos = 0;
-        updateScreen();
+        if (encoder.isLeft()) {
+            if (value[pos] > 0) value[pos]--;
+            else value[pos] = 9;
+            updateScreen();
+        }
+        else if (encoder.isRight()) {
+            if (value[pos] < 9) value[pos]++;
+            else value[pos] = 0;
+            updateScreen();
+        }
+        else if ((btnCurrentState == LOW) && (btnPrevState == HIGH)) {
+            if (pos < 3) pos++;
+            else pos = 0;
+            updateScreen();
+        }
         
-    }
-    
-    radio.setPacketValue((uint32_t)
-                        (value[3] * 1000 +
-                        value[2] *  100 +
-                        value[1] *   10 +
-                        value[0]));
-    radio.sendPacket();
-
-    btnPrevState = btnCurrentState;
+        radio.setPacketValue((uint32_t)
+                              value[3] * 1000 + 
+                              value[2] *  100 +
+                              value[1] *   10 +
+                              value[0]);
+        radio.sendPacket();
+        
+        btnPrevState = btnCurrentState;
 }
 
+#elif MODE == SLAVE
 
 void slave::setup()
 {
@@ -178,6 +188,10 @@ void slave::updateScreen()
     lcd.print(buffer);
 }
 
+#endif
+
+#if MODE == MASTER
+
 ISR(PCINT0_vect) {
     //enc1.tick();
 }
@@ -187,3 +201,5 @@ ISR(PCINT1_vect) {
 ISR(PCINT2_vect) {
     master::encoder.tick();
 }
+
+#endif
