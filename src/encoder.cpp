@@ -28,7 +28,7 @@ Encoder::Encoder(uint8_t clk, uint8_t dt, int8_t sw, bool type) {
 	
 	pinMode(_CLK, (DEFAULT_ENC_PULL ? INPUT : INPUT_PULLUP));
 	pinMode(_DT, (DEFAULT_ENC_PULL ? INPUT : INPUT_PULLUP));	
-	if (flags.use_button) pinMode(_SW, (DEFAULT_BTN_PULL ? INPUT : INPUT_PULLUP));	
+	if (flags.use_button) pinMode(_SW, INPUT);//(DEFAULT_BTN_PULL ? INPUT : INPUT_PULLUP));	
 	flags.invBtn = (DEFAULT_BTN_PULL == HIGH_PULL) ? true : false;
 
 #if defined(FAST_ALGORITHM)
@@ -182,8 +182,7 @@ void Encoder::tick() {
 
 #ifdef ENC_WITH_BUTTON
 	if (flags.use_button) {
-		if (!extTick) SW_state = digitalRead(_SW) ^ flags.invBtn;	// читаем состояние кнопки SW
-		else SW_state = flags.extSW;
+		SW_state = digitalRead(_SW);	// читаем состояние кнопки SW
 		
 		if (SW_state && !flags.butt_flag && (debounceDelta > ENC_DEBOUNCE_BUTTON)) {
 			flags.butt_flag = true;
