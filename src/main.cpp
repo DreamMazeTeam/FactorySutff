@@ -17,7 +17,7 @@
 #define SLAVE  0
 #define MASTER 1
 
-#define MODE MASTER
+#define MODE SLAVE
 
 RF24 radio(pinCeRf24, pinCsRf24);
 Encoder encoder(pinEncClk, pinEncDt, pinEncSw);
@@ -50,7 +50,11 @@ void loop() {
     unsigned int v;
     if( rd.receivePacket() ){
         v = rd.getPacketValue(0);
-        Serial.println(v);
+        Serial.println(v); 
+        lcd.setCursor(0,0);
+        lcd.print(v);
+        //delay(10);
+        //lcd.clear();
     }
 #elif MODE == MASTER
     tm = millis();
