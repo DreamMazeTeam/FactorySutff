@@ -18,7 +18,7 @@
 #define LOW_PULL 1		// внешняя подтяжка к GND (pinMode INPUT)
 
 // закомментируй строку, чтобы полностью убрать отработку кнопки из кода
-#define ENC_WITH_BUTTON
+//#define ENC_WITH_BUTTON
 
 // тип подключения энкодера по умолчанию (LOW_PULL или HIGH_PULL)
 //#define DEFAULT_ENC_PULL LOW_PULL
@@ -35,7 +35,7 @@
 
 // настройка антидребезга энкодера, кнопки, таймаута удержания и таймаута двойного клика
 #define ENC_DEBOUNCE_TURN 1
-#define ENC_DEBOUNCE_BUTTON 80
+#define ENC_DEBOUNCE_BUTTON 1
 #define ENC_HOLD_TIMEOUT 700
 #define ENC_DOUBLE_TIMEOUT 300
 
@@ -97,7 +97,6 @@ public:
 	
 	EncoderFlags flags;
 
-private:
 	uint8_t _fast_timeout = 50;				// таймаут быстрого поворота
 	uint8_t prevState = 0;
 	uint8_t encState = 0;	// 0 не крутился, 1 лево, 2 право, 3 лево нажат, 4 право нажат
