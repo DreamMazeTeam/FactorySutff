@@ -29,9 +29,9 @@
 #define DEFAULT_BTN_PULL HIGH_PULL
 
 // алгоритмы опроса энкодера (раскомментировать нужный)
-#define FAST_ALGORITHM		// тик 10 мкс, быстрый, не справляется с люфтами
+//#define FAST_ALGORITHM		// тик 10 мкс, быстрый, не справляется с люфтами
 //#define BINARY_ALGORITHM	// тик 14 мкс, лучше справляется с люфтами
-//#define PRECISE_ALGORITHM	// тик 16 мкс, медленнее, но работает даже с убитым энкодером (по мотивам https://github.com/mathertel/RotaryEncoder)
+#define PRECISE_ALGORITHM	// тик 16 мкс, медленнее, но работает даже с убитым энкодером (по мотивам https://github.com/mathertel/RotaryEncoder)
 
 // настройка антидребезга энкодера, кнопки, таймаута удержания и таймаута двойного клика
 #define ENC_DEBOUNCE_TURN 1
@@ -95,8 +95,9 @@ public:
 	bool isSingle();						// возвращает true при одиночном клике (после таймаута), сама сбрасывается в false
 	bool isDouble();						// возвращает true при двойном клике, сама сбрасывается в false
 	
-private:
 	EncoderFlags flags;
+
+private:
 	uint8_t _fast_timeout = 50;				// таймаут быстрого поворота
 	uint8_t prevState = 0;
 	uint8_t encState = 0;	// 0 не крутился, 1 лево, 2 право, 3 лево нажат, 4 право нажат
