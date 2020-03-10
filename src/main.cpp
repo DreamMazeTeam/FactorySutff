@@ -3,7 +3,7 @@
 #define SLAVE   0
 #define MASTER  1
 
-#define MODE MASTER
+#define MODE SLAVE
 
 #if MODE == MASTER
     #define src master
