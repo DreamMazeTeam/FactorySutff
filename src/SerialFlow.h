@@ -47,6 +47,7 @@ public:
      */
     #ifdef __RF24_H__
 	void begin( uint64_t address1, uint64_t address2 );
+    RF24& getRf24();
 	#else
     void begin( uint16_t baud_rate );
 	#endif

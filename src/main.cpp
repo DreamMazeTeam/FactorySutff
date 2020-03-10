@@ -11,6 +11,7 @@
     #define src slave
 #endif
 
+#include "rf24v.h"
 #include "encoder.h"
 #include "SerialFlow.h"
 #include "liquid_crystal_i2c.h"
@@ -47,6 +48,7 @@ namespace master
     Encoder encoder(CLK, DT, SW);
     SerialFlow radio(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
+    RF24V sound(radio.getRf24(), 0);
 
     int btnPrevState;
     int btnCurrentState;
@@ -125,6 +127,7 @@ void master::setup()
 
     radio.setPacketFormat(2, 1);
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
+    radio.getRf24().setDataRate(RF24_250KBPS);
 
     updateScreen();
 }

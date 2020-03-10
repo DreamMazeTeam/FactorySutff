@@ -31,6 +31,9 @@ void SerialFlow::begin( uint64_t address1, uint64_t address2 ) {
 	
     _serial->startListening();	
 }
+RF24& SerialFlow::getRf24() {
+    return *this->_serial;
+}
 #else
 void SerialFlow::begin( uint16_t baud_rate ) {
     _serial->begin(baud_rate);
