@@ -24,7 +24,10 @@
 #define BUTTON  7
 #define SCRADDR 0x27
 
+
+
 #define VALUE_LEN 4
+
 
 #if MODE == SLAVE
 
@@ -32,7 +35,7 @@ namespace slave
 {
     SerialFlow radio(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
-
+     RF24V sound(radio.getRf24(), 0);
     uint32_t buffer;
 
     void setup();
@@ -112,6 +115,7 @@ void master::updateScreen()
 
 void master::setup() 
 {
+    
     pinMode(SW, INPUT);
     pinMode(BUTTON, INPUT);
 
@@ -124,6 +128,7 @@ void master::setup()
 
     encoder.setType(TYPE2);
     encoder.setDirection(REVERSE);
+    sound.transfer();
 
     radio.setPacketFormat(2, 1);
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
@@ -158,6 +163,7 @@ void master::loop()
                               value[2] *   10 +
                               value[3]);
         radio.sendPacket();
+         
         
         btnPrevState = btnCurrentState;
 }
@@ -169,9 +175,11 @@ void slave::setup()
     lcd.begin();
     lcd.backlight();
     lcd.blink_off();
+    sound.reader();
 
     radio.begin(0xF0F0F0F0D2LL,0xF0F0F0F0E1LL);
     radio.setPacketFormat(2, 1);
+    pinMode(9, OUTPUT); 
 }
 
 void slave::loop()
