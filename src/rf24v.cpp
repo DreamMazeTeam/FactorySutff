@@ -16,13 +16,14 @@ unsigned int sampl; byte bytL;
 #endif
 unsigned long volTime = 0; RF24 radi(0,0);
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || (__AVR_ATmega32U4__) || (__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__) || (__AVR_ATmega128__) ||defined(__AVR_ATmega1281__)||defined(__AVR_ATmega2561__)
-#define rampMega
+	#define rampMega
 #endif
 const byte broadcastVal = 255; RF24V::RF24V(RF24& _radio, byte radioNum): radio(_radio){radi = radio;radioIdentifier = radioNum;}
 void RF24V::begin(){radio.begin();
 #if defined (ENABLE_LED)
 #endif
-pinMode(speakerPin,OUTPUT); 		pinMode(speakerPin2,OUTPUT);
+pinMode(speakerPin,OUTPUT);
+pinMode(speakerPin2,OUTPUT); 		
 pinMode(TX_PIN,INPUT_PULLUP);
 if(SAMPLE_RATE < 16000){volMod = 3;}else{
 #if !defined (tenBit)
