@@ -1,9 +1,12 @@
 #include <Arduino.h>
 
+
 #define SLAVE   0
 #define MASTER  1
 
+
 #define MODE MASTER
+
 
 #if MODE == MASTER
     #define src master
@@ -11,11 +14,13 @@
     #define src slave
 #endif
 
+
 #include "rf24v.h"
 #include "encoder.h"
 #include "pcf8591p.h"
 #include "SerialFlow.h"
 #include "liquid_crystal_i2c.h"
+
 
 #define CE      5
 #define CS      6
@@ -24,7 +29,6 @@
 #define CLK     4
 #define BUTTON  7
 #define SCRADDR 0x27
-
 
 
 #define VALUE_LEN 4
@@ -36,7 +40,7 @@ namespace slave
 {
     SerialFlow radio(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
-     RF24V sound(radio.getRf24(), 0);
+    RF24V sound(radio.getRf24(), 0);
     uint32_t buffer;
 
     void setup();
@@ -130,7 +134,7 @@ void master::setup()
 
     encoder.setType(TYPE2);
     encoder.setDirection(REVERSE);
-    sound.transfer();
+    // sound.transfer();
 
     radio.setPacketFormat(2, 1);
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
@@ -141,33 +145,34 @@ void master::setup()
 
 void master::loop()
 {
-        btnCurrentState = digitalRead(BUTTON);
+    btnCurrentState = digitalRead(BUTTON);
 
-        if (encoder.isLeft()) {
-            if (value[pos] > 0) value[pos]--;
-            else value[pos] = 9;
-            updateScreen();
-        }
-        else if (encoder.isRight()) {
-            if (value[pos] < 9) value[pos]++;
-            else value[pos] = 0;
-            updateScreen();
-        }
-        else if ((btnCurrentState == LOW) && (btnPrevState == HIGH)) {
-            if (pos < 3) pos++;
-            else pos = 0;
-            updateScreen();
-        }
+    if (encoder.isLeft()) {
+        if (value[pos] > 0) value[pos]--;
+        else value[pos] = 9;
+        updateScreen();
+    }
+    else if (encoder.isRight()) {
+        if (value[pos] < 9) value[pos]++;
+        else value[pos] = 0;
+        updateScreen();
+    }
+    else if ((btnCurrentState == LOW) && (btnPrevState == HIGH)) {
+        if (pos < 3) pos++;
+        else pos = 0;
+        updateScreen();
+    }
+    
+    radio.setPacketValue((uint32_t)
+                            value[0] * 1000 + 
+                            value[1] *  100 +
+                            value[2] *   10 +
+                            value[3]);
+    radio.sendPacket();
         
-        radio.setPacketValue((uint32_t)
-                              value[0] * 1000 + 
-                              value[1] *  100 +
-                              value[2] *   10 +
-                              value[3]);
-        radio.sendPacket();
-         
-        
-        btnPrevState = btnCurrentState;
+    acp.analogReadAll();
+
+    btnPrevState = btnCurrentState;
 }
 
 #elif MODE == SLAVE
