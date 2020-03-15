@@ -13,6 +13,7 @@
 
 #include "rf24v.h"
 #include "encoder.h"
+#include "pcf8591p.h"
 #include "SerialFlow.h"
 #include "liquid_crystal_i2c.h"
 
@@ -52,6 +53,7 @@ namespace master
     SerialFlow radio(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
     RF24V sound(radio.getRf24(), 0);
+    PCF8591 acp(0x48);
 
     int btnPrevState;
     int btnCurrentState;
