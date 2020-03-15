@@ -162,6 +162,8 @@ byte getADC(byte channel)
     return value;
 }
 
+// ctfyguu
+
 void master::loop()
 {
     btnCurrentState = digitalRead(BUTTON);
@@ -191,7 +193,7 @@ void master::loop()
         
 
     Serial.println(getADC(0));
-    
+
 
     btnPrevState = btnCurrentState;
 }
