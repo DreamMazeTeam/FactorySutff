@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include <Wire.h>
 
 #define SLAVE   0
 #define MASTER  1
@@ -146,6 +146,22 @@ void master::setup()
     updateScreen();
 }
 
+byte getADC(byte channel)
+{
+    if (channel > 3) channel = 0;
+
+    Wire.beginTransmission(0x49);
+    Wire.write(channel);
+    Wire.endTransmission();
+
+    Wire.requestFrom(0x49, 2);
+    Wire.read();
+
+    int value = Wire.read();
+
+    return value;
+}
+
 void master::loop()
 {
     btnCurrentState = digitalRead(BUTTON);
@@ -173,7 +189,9 @@ void master::loop()
                             value[3]);
     radio.sendPacket();
         
-    acp.analogReadAll();
+
+    Serial.println(getADC(0));
+    
 
     btnPrevState = btnCurrentState;
 }
