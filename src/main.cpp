@@ -121,6 +121,9 @@ void master::updateScreen()
 
 void master::setup() 
 {
+#ifdef PCF8591_DEBUG
+    Serial.begin(9600);
+#endif
     
     pinMode(SW, INPUT);
     pinMode(BUTTON, INPUT);
