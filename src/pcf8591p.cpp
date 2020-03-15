@@ -99,11 +99,11 @@ struct PCF8591::AnalogInput PCF8591::analogReadAll(byte readType){
 	DEBUG_PRINT("ain0 -> ");
 	DEBUG_PRINTLN(analogInput.ain0);
 	DEBUG_PRINT("ain1 -> ");
-	DEBUG_PRINTLN(analogInput.ain0);
+	DEBUG_PRINTLN(analogInput.ain1);
 	DEBUG_PRINT("ain2 -> ");
-	DEBUG_PRINTLN(analogInput.ain0);
+	DEBUG_PRINTLN(analogInput.ain2);
 	DEBUG_PRINT("ain3 -> ");
-	DEBUG_PRINTLN(analogInput.ain0);
+	DEBUG_PRINTLN(analogInput.ain3);
 
 	return analogInput;
 };
