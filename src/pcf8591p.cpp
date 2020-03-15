@@ -87,7 +87,7 @@ struct PCF8591::AnalogInput PCF8591::analogReadAll(byte readType){
 	_wire->write(operation); // control byte: reads ADC0 then auto-increment
 	DEBUG_PRINTLN("End write (If code stop here add pullup resistor on SDA SCL)");
 	_wire->endTransmission(); // end tranmission
-	DEBUG_PRINTLN("Request response");
+	DEBUG_PRINTLN("Request response: ");
 	_wire->requestFrom(_address, (uint8_t)5);
 
 	/*uint8_t control =*/_wire->read();
@@ -95,6 +95,15 @@ struct PCF8591::AnalogInput PCF8591::analogReadAll(byte readType){
 	analogInput.ain1=_wire->read();
 	analogInput.ain2=_wire->read();
 	analogInput.ain3=_wire->read();
+
+	DEBUG_PRINT("ain0 -> ");
+	DEBUG_PRINTLN(analogInput.ain0);
+	DEBUG_PRINT("ain1 -> ");
+	DEBUG_PRINTLN(analogInput.ain0);
+	DEBUG_PRINT("ain2 -> ");
+	DEBUG_PRINTLN(analogInput.ain0);
+	DEBUG_PRINT("ain3 -> ");
+	DEBUG_PRINTLN(analogInput.ain0);
 
 	return analogInput;
 };
