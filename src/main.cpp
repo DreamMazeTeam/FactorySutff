@@ -163,13 +163,16 @@ void master::loop()
         updateScreen();
     }
     
-    radio.setPacketValue((uint32_t)
-                            value[0] * 1000 + 
-                            value[1] *  100 +
-                            value[2] *   10 +
-                            value[3]); 
+    uint32_t buffer = value[0] * 1000 + 
+                      value[1] *  100 +
+                      value[2] *   10 +
+                      value[3];
+
+    uint32_t mbuffer = (uint32_t)analogRead(MICRO);
+
+    radio.setPacketValue((uint32_t)buffer); 
     
-    radio.setPacketValue((uint32_t)analogRead(MICRO));
+    radio.setPacketValue((uint32_t)mbuffer);
 
     radio.sendPacket();
 
@@ -178,6 +181,9 @@ void master::loop()
 #ifdef __DEBUG
 
     Serial.println("Sent data");
+    Serial.println(buffer);
+    Serial.println(mbuffer);
+    delay(500);
 
 #endif
 }
