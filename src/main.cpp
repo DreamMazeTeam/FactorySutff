@@ -6,7 +6,7 @@
 
 
 #define MODE MASTER
-
+#define __DEBUG
 
 #if MODE == MASTER
     #define src master
@@ -15,9 +15,7 @@
 #endif
 
 
-#include "rf24v.h"
 #include "encoder.h"
-#include "pcf8591p.h"
 #include "SerialFlow.h"
 #include "liquid_crystal_i2c.h"
 
@@ -29,8 +27,9 @@
 #define CLK     4
 #define BUTTON  7
 #define SCRADDR 0x27
-#define DIOD 9
-#define MICRO A0
+#define DR      9
+#define DL      10
+#define MICRO   A0
 
 
 #define VALUE_LEN 4
@@ -41,9 +40,7 @@
 namespace slave
 {
     SerialFlow radio(CE, CS);
-    SerialFlow radio2(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
-    RF24V sound(radio.getRf24(), 0);
     uint32_t buffer;
 
     void setup();
@@ -58,10 +55,7 @@ namespace master
 {
     Encoder encoder(CLK, DT, SW);
     SerialFlow radio(CE, CS);
-    SerialFlow radio2(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
-    RF24V sound(radio.getRf24(), 0);
-    PCF8591 acp(0x48);
 
     int btnPrevState;
     int btnCurrentState;
@@ -125,7 +119,7 @@ void master::updateScreen()
 
 void master::setup() 
 {
-#ifdef PCF8591_DEBUG
+#ifdef __DEBUG
     Serial.begin(9600);
 #endif
     
@@ -142,11 +136,9 @@ void master::setup()
 
     encoder.setType(TYPE2);
     encoder.setDirection(REVERSE);
-    // sound.transfer();
 
     radio.setPacketFormat(2, 2);
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
-    radio.getRf24().setDataRate(RF24_250KBPS);
 
     updateScreen();
 }
@@ -182,19 +174,28 @@ void master::loop()
     radio.sendPacket();
 
     btnPrevState = btnCurrentState;
+
+#ifdef __DEBUG
+
+    Serial.println("Sent data");
+
+#endif
 }
 
 #elif MODE == SLAVE
 
 void slave::setup()
 {
+#ifdef __DEBUG
+    Serial.begin(9600);
+#endif
+
     lcd.begin();
     lcd.backlight();
     lcd.blink_off();
-    sound.reader();
 
-    radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
     radio.setPacketFormat(2, 2);
+    radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
 
     pinMode(9, OUTPUT); 
     pinMode(10, OUTPUT);
@@ -214,6 +215,13 @@ void slave::loop()
 
         analogWrite(9, volume);
         analogWrite(9, volume);
+
+#ifdef __DEBUG
+
+        Serial.println(data);
+        Serial.println(volume);
+
+#endif
     }
 }
 
