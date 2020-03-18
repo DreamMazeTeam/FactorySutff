@@ -183,8 +183,7 @@ void master::loop()
     Serial.println("Sent data");
     Serial.println(buffer);
     Serial.println(mbuffer);
-    delay(500);
-
+    
 #endif
 }
 
