@@ -29,6 +29,8 @@
 #define CLK     4
 #define BUTTON  7
 #define SCRADDR 0x27
+#define DIOD 9
+#define MICRO A0
 
 
 #define VALUE_LEN 4
@@ -39,6 +41,7 @@
 namespace slave
 {
     SerialFlow radio(CE, CS);
+    SerialFlow radio2(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
     RF24V sound(radio.getRf24(), 0);
     uint32_t buffer;
@@ -55,6 +58,7 @@ namespace master
 {
     Encoder encoder(CLK, DT, SW);
     SerialFlow radio(CE, CS);
+    SerialFlow radio2(CE, CS);
     LiquidCrystal lcd(SCRADDR, 16, 2);
     RF24V sound(radio.getRf24(), 0);
     PCF8591 acp(0x48);
@@ -77,12 +81,62 @@ namespace master
 
 #endif
 
+#define TEST
+
+#ifdef TEST
+
+SerialFlow rd(CE, CS);
+
+    #if MODE == MASTER
+
+    #elif MODE == SLAVE
+
+    #endif
+#endif
+
 void setup() {
-    src::setup();
+    // src::setup();
+#ifdef TEST
+
+    rd.setPacketFormat(2, 1);
+
+    #if MODE == MASTER
+
+    rd.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
+
+    #elif MODE == SLAVE
+
+    rd.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
+    Serial.begin(9600);
+    
+    #endif
+#endif
 }
 
 void loop() {
-    src::loop();
+    // src::loop();
+#ifdef TEST
+
+    int data;
+
+    #if MODE == MASTER
+
+    data = analogRead(MICRO);
+    rd.setPacketValue( 228 );
+    rd.sendPacket();
+    
+
+    #elif MODE == SLAVE
+
+    unsigned int v;
+    if( rd.receivePacket() ){
+        v = rd.getPacketValue(0);
+        Serial.println(v);
+    }
+    
+
+    #endif
+#endif
 }
 
 #if MODE == MASTER
@@ -143,6 +197,10 @@ void master::setup()
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
     radio.getRf24().setDataRate(RF24_250KBPS);
 
+    radio2.setPacketFormat(2, 1);
+    radio2.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
+    radio2.getRf24().setDataRate(RF24_250KBPS);
+
     updateScreen();
 }
 
@@ -161,8 +219,6 @@ byte getADC(byte channel)
 
     return value;
 }
-
-// ctfyguu
 
 void master::loop()
 {
@@ -188,7 +244,11 @@ void master::loop()
                             value[0] * 1000 + 
                             value[1] *  100 +
                             value[2] *   10 +
-                            value[3]);
+                            value[3]); 
+
+    radio.setPacketValue(analogRead(MICRO));
+
+    radio2.sendPacket();
     radio.sendPacket();
         
 
@@ -207,8 +267,12 @@ void slave::setup()
     lcd.blink_off();
     sound.reader();
 
-    radio.begin(0xF0F0F0F0D2LL,0xF0F0F0F0E1LL);
+    radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
     radio.setPacketFormat(2, 1);
+
+    radio2.begin(0xF0F1F2F3F4LL, 0xF0F1F2F3F0LL);
+    radio2.setPacketFormat(2, 1);
+
     pinMode(9, OUTPUT); 
 }
 
