@@ -5,7 +5,7 @@
 #define MASTER  1
 
 
-#define MODE MASTER
+#define MODE SLAVE
 #define __DEBUG
 
 #if MODE == MASTER
@@ -218,7 +218,7 @@ void slave::loop()
 
 #ifdef __DEBUG
             Serial.print("Digit: ");
-            Serial.prinln(buffer);
+            Serial.println(buffer);
 #endif
         }
 
