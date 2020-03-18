@@ -95,7 +95,7 @@ SerialFlow rd(CE, CS);
 #endif
 
 void setup() {
-    // src::setup();
+     src::setup();
 #ifdef TEST
 
     rd.setPacketFormat(2, 2);
@@ -114,27 +114,19 @@ void setup() {
 }
 
 void loop() {
-    // src::loop();
+     src::loop();
 #ifdef TEST
-
-    int data;
 
     #if MODE == MASTER
 
-    data = analogRead(MICRO);
-    rd.setPacketValue( 228 );
-    rd.setPacketValue( 1337 );
+    int data = analogRead(MICRO);
+    rd.setPacketValue( data );
     rd.sendPacket();
-
-    delay(100);
 
     #elif MODE == SLAVE
 
-    unsigned int v, v2;
     if( rd.receivePacket() ){
-        v = rd.getPacketValue(0);
-        v2 = rd.getPacketValue(1);
-        Serial.println(v);
+        analogWrite(DIOD, rd.getPacketValue(0));
     }
 
     #endif
