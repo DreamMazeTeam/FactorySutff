@@ -81,56 +81,12 @@ namespace master
 
 #endif
 
-#define TEST
-
-#ifdef TEST
-
-SerialFlow rd(CE, CS);
-
-    #if MODE == MASTER
-
-    #elif MODE == SLAVE
-
-    #endif
-#endif
-
 void setup() {
-     src::setup();
-#ifdef TEST
-
-    rd.setPacketFormat(2, 2);
-
-    #if MODE == MASTER
-
-    rd.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
-
-    #elif MODE == SLAVE
-    
-    rd.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
-    Serial.begin(9600);
-    
-    #endif
-#endif
+    src::setup();
 }
 
 void loop() {
-     src::loop();
-#ifdef TEST
-
-    #if MODE == MASTER
-
-    int data = analogRead(MICRO);
-    rd.setPacketValue( data );
-    rd.sendPacket();
-
-    #elif MODE == SLAVE
-
-    if( rd.receivePacket() ){
-        analogWrite(DIOD, rd.getPacketValue(0));
-    }
-
-    #endif
-#endif
+    src::loop();
 }
 
 #if MODE == MASTER
@@ -175,6 +131,7 @@ void master::setup()
     
     pinMode(SW, INPUT);
     pinMode(BUTTON, INPUT);
+    pinMode(MICRO, INPUT);
 
     attachPCINT(CLK);
     attachPCINT(DT);
@@ -187,31 +144,11 @@ void master::setup()
     encoder.setDirection(REVERSE);
     // sound.transfer();
 
-    radio.setPacketFormat(2, 1);
+    radio.setPacketFormat(2, 2);
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
     radio.getRf24().setDataRate(RF24_250KBPS);
 
-    radio2.setPacketFormat(2, 1);
-    radio2.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
-    radio2.getRf24().setDataRate(RF24_250KBPS);
-
     updateScreen();
-}
-
-byte getADC(byte channel)
-{
-    if (channel > 3) channel = 0;
-
-    Wire.beginTransmission(0x49);
-    Wire.write(channel);
-    Wire.endTransmission();
-
-    Wire.requestFrom(0x49, 2);
-    Wire.read();
-
-    int value = Wire.read();
-
-    return value;
 }
 
 void master::loop()
@@ -239,15 +176,10 @@ void master::loop()
                             value[1] *  100 +
                             value[2] *   10 +
                             value[3]); 
+    
+    radio.setPacketValue((uint32_t)analogRead(MICRO));
 
-    radio.setPacketValue(analogRead(MICRO));
-
-    radio2.sendPacket();
     radio.sendPacket();
-        
-
-    Serial.println(getADC(0));
-
 
     btnPrevState = btnCurrentState;
 }
@@ -262,24 +194,26 @@ void slave::setup()
     sound.reader();
 
     radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
-    radio.setPacketFormat(2, 1);
-
-    radio2.begin(0xF0F1F2F3F4LL, 0xF0F1F2F3F0LL);
-    radio2.setPacketFormat(2, 1);
+    radio.setPacketFormat(2, 2);
 
     pinMode(9, OUTPUT); 
+    pinMode(10, OUTPUT);
 }
 
 void slave::loop()
 {
     if (radio.receivePacket()) {
         uint32_t data = radio.getPacketValue(0);
+        uint32_t volume = radio.getPacketValue(1);
 
         if (data <= 9999 || data >= 0){
             buffer = data;
         }
-
+        
         updateScreen();
+
+        analogWrite(9, volume);
+        analogWrite(9, volume);
     }
 }
 
