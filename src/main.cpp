@@ -213,21 +213,25 @@ void slave::loop()
         uint32_t data = radio.getPacketValue(0);
         uint32_t volume = radio.getPacketValue(1);
 
-        if (data <= 9999 || data >= 0){
+        if (data <= 9999 && data >= 0){
             buffer = data;
-        }
-        
-        updateScreen();
-
-        analogWrite(9, volume);
-        analogWrite(9, volume);
+            updateScreen();
 
 #ifdef __DEBUG
-
-        Serial.println(data);
-        Serial.println(volume);
-
+            Serial.print("Digit: ");
+            Serial.prinln(buffer);
 #endif
+        }
+
+        if (volume >= 0 && volume <= 1023){
+            analogWrite(9, volume);
+            analogWrite(10, volume);
+
+#ifdef __DEBUG
+            Serial.print("Volume: ");
+            Serial.println(volume);
+#endif
+        }
     }
 }
 
