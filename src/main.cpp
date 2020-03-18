@@ -5,7 +5,7 @@
 #define MASTER  1
 
 
-#define MODE SLAVE
+#define MODE MASTER
 #define __DEBUG
 
 #if MODE == MASTER
@@ -33,6 +33,8 @@
 
 
 #define VALUE_LEN 4
+#define MICRO_OFFSET 255
+#define MICRO_FREQ 4
 
 
 #if MODE == SLAVE
@@ -121,6 +123,7 @@ void master::setup()
 {
 #ifdef __DEBUG
     Serial.begin(9600);
+
 #endif
     
     pinMode(SW, INPUT);
@@ -168,7 +171,7 @@ void master::loop()
                       value[2] *   10 +
                       value[3];
 
-    uint32_t mbuffer = (uint32_t)analogRead(MICRO);
+    uint32_t mbuffer = static_cast<uint32_t>(analogRead(MICRO));
 
     radio.setPacketValue((uint32_t)buffer); 
     
@@ -202,15 +205,15 @@ void slave::setup()
     radio.setPacketFormat(2, 2);
     radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
 
-    pinMode(9, OUTPUT); 
-    pinMode(10, OUTPUT);
+    pinMode(DR, OUTPUT); 
+    pinMode(DL, OUTPUT);
 }
 
 void slave::loop()
 {
     if (radio.receivePacket()) {
         uint32_t data = radio.getPacketValue(0);
-        uint32_t volume = radio.getPacketValue(1);
+        uint32_t volume = map((double)radio.getPacketValue(1);
 
         if (data <= 9999 && data >= 0){
             buffer = data;
