@@ -86,7 +86,6 @@ namespace master
 #ifdef TEST
 
 SerialFlow rd(CE, CS);
-SerialFlow rd2(CE, CS);
 
     #if MODE == MASTER
 
@@ -99,18 +98,15 @@ void setup() {
     // src::setup();
 #ifdef TEST
 
-    rd.setPacketFormat(2, 1);
-    rd2.setPacketFormat(2, 1);
+    rd.setPacketFormat(2, 2);
 
     #if MODE == MASTER
 
     rd.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
-    rd2.begin(0xF0F0F0F0E0LL,0xF0F0F0F0D1LL);
 
     #elif MODE == SLAVE
     
     rd.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
-    rd2.begin(0xF0F0F0F0D1LL, 0xF0F0F0F0E0LL);
     Serial.begin(9600);
     
     #endif
@@ -127,25 +123,19 @@ void loop() {
 
     data = analogRead(MICRO);
     rd.setPacketValue( 228 );
+    rd.setPacketValue( 1337 );
     rd.sendPacket();
 
-    rd2.setPacketValue( 1337 );
-    rd2.sendPacket();
-    
+    delay(100);
 
     #elif MODE == SLAVE
 
-    unsigned int v;
+    unsigned int v, v2;
     if( rd.receivePacket() ){
         v = rd.getPacketValue(0);
+        v2 = rd.getPacketValue(1);
         Serial.println(v);
     }
-
-    if( rd2.receivePacket() ){
-        v = rd2.getPacketValue(0);
-        Serial.println(v);
-    }
-    
 
     #endif
 #endif
