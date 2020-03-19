@@ -164,7 +164,10 @@ void master::loop()
         if (pos < 3) pos++;
         else pos = 0;
         updateScreen();
-    }
+    } 
+
+    #ifdef SMTH
+    #endif
     
     uint32_t buffer = value[0] * 1000 + 
                       value[1] *  100 +
