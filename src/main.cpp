@@ -5,7 +5,7 @@
 #define MASTER  1
 
 
-#define MODE MASTER
+#define MODE SLAVE
 #define __DEBUG
 
 #if MODE == MASTER
@@ -78,6 +78,10 @@ namespace master
 #endif
 
 void setup() {
+
+    TCCR1A = TCCR1A & 0xe0 | 3; 
+    TCCR1B = TCCR1B & 0xe0 | 0x09;
+
     src::setup();
 }
 
@@ -122,8 +126,7 @@ void master::updateScreen()
 void master::setup() 
 {
 #ifdef __DEBUG
-    Serial.begin(9600);
-
+    Serial.begin(9600); 
 #endif
     
     pinMode(SW, INPUT);
@@ -140,6 +143,7 @@ void master::setup()
     encoder.setType(TYPE2);
     encoder.setDirection(REVERSE);
 
+    radio.getPacketValue(1);
     radio.setPacketFormat(2, 2);
     radio.begin(0xF0F0F0F0E1LL,0xF0F0F0F0D2LL);
 
@@ -174,11 +178,11 @@ void master::loop()
                       value[2] *   10 +
                       value[3];
 
-    uint32_t mbuffer = static_cast<uint32_t>(analogRead(MICRO));
+    int mbuffer = analogRead(MICRO);
 
     radio.setPacketValue((uint32_t)buffer); 
     
-    radio.setPacketValue((uint32_t)mbuffer);
+    radio.setPacketValue(mbuffer);
 
     radio.sendPacket();
 
@@ -205,6 +209,7 @@ void slave::setup()
     lcd.backlight();
     lcd.blink_off();
 
+    radio.getRf24().setDataRate(RF24_2MBPS);
     radio.setPacketFormat(2, 2);
     radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
 
@@ -216,7 +221,8 @@ void slave::loop()
 {
     if (radio.receivePacket()) {
         uint32_t data = radio.getPacketValue(0);
-        uint32_t volume = map((double)radio.getPacketValue(1);
+        uint32_t _b = radio.getPacketValue(1);
+        int& volume = *(int*)&_b; 
 
         if (data <= 9999 && data >= 0){
             buffer = data;
