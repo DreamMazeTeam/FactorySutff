@@ -209,8 +209,7 @@ void slave::setup()
     lcd.backlight();
     lcd.blink_off();
 
-    radio.getRf24().setDataRate(RF24_2MBPS);
-    radio.setPacketFormat(2, 2);
+    radio.setPacketFormat(2, 1);
     radio.begin(0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL);
 
     pinMode(DR, OUTPUT); 
@@ -220,11 +219,11 @@ void slave::setup()
 void slave::loop()
 {
     if (radio.receivePacket()) {
-        uint32_t data = radio.getPacketValue(0);
+        // uint32_t volume = radio.getPacketValue(0);
         uint32_t _b = radio.getPacketValue(1);
         int& volume = *(int*)&_b; 
 
-        if (data <= 9999 && data >= 0){
+        /* if (data <= 9999 && data >= 0){
             buffer = data;
             updateScreen();
 
@@ -232,7 +231,7 @@ void slave::loop()
             Serial.print("Digit: ");
             Serial.println(buffer);
 #endif
-        }
+        } */
 
         if (volume >= 0 && volume <= 1023){
             analogWrite(9, volume);
