@@ -225,11 +225,11 @@ void slave::setup()
 void slave::loop()
 {
     if (radio.receivePacket()) {
-        // uint32_t volume = radio.getPacketValue(0);
+        uint32_t data = radio.getPacketValue(0);
         uint32_t _b = radio.getPacketValue(1);
         int& volume = *(int*)&_b; 
 
-        /* if (data <= 9999 && data >= 0){
+         if (data <= 9999 && data >= 0){
             buffer = data;
             updateScreen();
 
@@ -237,7 +237,7 @@ void slave::loop()
             Serial.print("Digit: ");
             Serial.println(buffer);
 #endif
-        } */
+        } 
 
         if (volume >= 0 && volume <= 1023){
             analogWrite(9, volume);
